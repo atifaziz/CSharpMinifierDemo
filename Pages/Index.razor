@@ -1,0 +1,81 @@
+﻿@page "/"
+@using System.Diagnostics
+@using System.Linq;
+@using System.Security.Cryptography
+@using System.Text;
+@using CSharpMinifier
+
+<div id="stats">
+    @if (_ms is TimeSpan ms)
+    {
+        <span title="Peformance">&#x231A; @ms.TotalSeconds.ToString("0.0000") secs</span>
+        <span>Input: @_input.Length.ToString("N0") chars</span>
+        <span>Output: @_output.Length.ToString("N0") chars (@(Math.Round(_output.Length * 100.0 / _input.Length, 0))%)</span>
+        <span>Tokens: @_tokenCount.ToString("N0")</span>
+        <span>SHA256: <span id="hash">@_hash</span></span>
+    }
+    else
+    {
+        <span style="visibility: hidden">&hellips;</span>
+    }
+</div>
+
+<textarea bind-value-oninput=@_input
+          onkeyup=@(_ => Minify())
+          placeholder="Enter/Paste some C# valid code here to minify"></textarea>
+
+<textarea readonly
+          class="@(_error ? "syntax-error" : null)"
+          bind=@_output></textarea>
+
+@functions
+{
+    string _input;
+    string _lastInput;
+    string _output;
+    int _tokenCount;
+    string _hash;
+    bool _error;
+    TimeSpan? _ms;
+
+    void Minify()
+    {
+        if (_lastInput == _input) {
+            return;
+        }
+
+        _lastInput = _input;
+        _error = false;
+        _ms = null;
+
+        if (_input.Length == 0) {
+            _output = string.Empty;
+            return;
+        }
+
+        var sw = Stopwatch.StartNew();
+
+        try
+        {
+            _output = string.Join(null, Minifier.Minify(_input));
+            _ms = sw.Elapsed;
+        }
+        catch (SyntaxErrorException e)
+        {
+            _output = e.Message;
+            _error = true;
+            return;
+        }
+
+        _tokenCount = Scanner.Scan(_input).Count();
+
+        using (var ha = HashAlgorithm.Create("SHA256"))
+        {
+            var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+            _hash =
+                BitConverter.ToString(ha.ComputeHash(utf8.GetBytes(_output)))
+                            .Replace("-", string.Empty)
+                            .ToLowerInvariant();
+        }
+    }
+}
