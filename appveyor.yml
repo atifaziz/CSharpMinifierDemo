@@ -27,7 +27,7 @@ build_script:
     $index = Get-Content -Raw $indexPath
     $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', "/$($env:APPVEYOR_PROJECT_NAME)/"
     Set-Content $indexPath $index -Encoding Ascii -NoNewline
-ggit :
+artifacts:
 - path: dist/project/dist
   name: dist
 deploy_script:
