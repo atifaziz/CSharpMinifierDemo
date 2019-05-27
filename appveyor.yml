@@ -31,6 +31,7 @@ artifacts:
   name: dist
 deploy_script:
 - ps: |
+    echo "`$ErrorActionPreference = $ErrorActionPreference"
     git config --global credential.helper store
     Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
     git config --global user.email $env:github_email
@@ -39,8 +40,10 @@ deploy_script:
     robocopy /s dist/project/dist ../io
     cd ../io
     git add . 2>&1
+    echo "`$LASTEXITCODE = $LASTEXITCODE"
     git commit -m "Deployment of $($env:APPVEYOR_REPO_COMMIT)"
     git push -n 2>&1
+    echo "`$LASTEXITCODE = $LASTEXITCODE"
 notifications:
 - provider: Email
   to:
