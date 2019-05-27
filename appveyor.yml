@@ -41,7 +41,7 @@ deploy_script:
     git config --global user.email $env:github_email
     git config --global user.name "Atif Aziz"
     git worktree add -b gh-pages ../io origin/gh-pages
-    robocopy /s dist/$($env:APPVEYOR_PROJECT_NAME)/dist ../io & exit 0
+    robocopy /s dist/$($env:APPVEYOR_PROJECT_NAME)/dist ../io
     cd ../io
     git add .
     git commit -m "Deployment of $($env:APPVEYOR_REPO_NAME)@$($env:APPVEYOR_REPO_COMMIT)"
