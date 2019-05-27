@@ -42,9 +42,9 @@ deploy_script:
     git worktree add -b gh-pages ../io origin/gh-pages
     robocopy /s dist/project/dist ../io
     cd ../io
-    git add .
+    git add . 2>&1
     git commit -m "Deployment of $($env:APPVEYOR_REPO_NAME)@$($env:APPVEYOR_REPO_COMMIT)"
-    git push
+    git push 2>&1
 notifications:
 - provider: Email
   to:
