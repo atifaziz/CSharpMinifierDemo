@@ -1,0 +1,54 @@
+version: '{build}'
+image: Visual Studio 2019
+environment:
+  access_token:
+    secure: I9LE/h29TZnDIt3tX2RLbHyfU0FnOhY15un0UDITT/I/2Em/41zaSgMMs+lgCXom
+  github_email:
+    secure: 8YvbPM+CXzOY+qR6r2+GqQ==
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+skip_commits:
+  files:
+    - '.git*'
+    - '.editorconfig'
+    - 'README.md'
+skip_tags: true
+install:
+- ps: Invoke-WebRequest -OutFile dotnet-install.ps1 https://dot.net/v1/dotnet-install.ps1
+- ps: ./dotnet-install.ps1 -Version ((type .\global.json | ConvertFrom-Json).sdk.version)
+before_build:
+- dotnet --info
+build_script:
+- ps: |
+    dotnet publish -c Release -o dist
+    ren "dist/$($env:APPVEYOR_PROJECT_NAME)" project
+    $indexPath = "dist/project/dist/index.html"
+    $index = Get-Content -Raw $indexPath
+    $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', "/$($env:APPVEYOR_PROJECT_NAME)/"
+    Set-Content $indexPath $index -Encoding Ascii -NoNewline
+artifacts:
+- path: dist/project/dist
+  name: dist
+deploy_script:
+- ps: |
+    if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) {
+      Write-Warning 'Skipping deployment for non-master or PR branch.'
+      return
+    }
+    git config --global credential.helper store
+    Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+    git config --global user.email $env:github_email
+    git config --global user.name "Atif Aziz"
+    git worktree add -b gh-pages ../io origin/gh-pages
+    robocopy /s dist/project/dist ../io
+    cd ../io
+    git add .
+    git commit -m "Deployment of $($env:APPVEYOR_REPO_NAME)@$($env:APPVEYOR_REPO_COMMIT)"
+    git push
+notifications:
+- provider: Email
+  to:
+  - raboof-ci@googlegroups.com
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false
