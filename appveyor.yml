@@ -20,7 +20,7 @@ before_build:
 - dotnet --info
 build_script:
 - dotnet publish -c Release -o dist
-- ps: $indexPath = ''.\dist\CSharpMinifierDemo\dist\index.html'
+- ps: $indexPath = '.\dist\CSharpMinifierDemo\dist\index.html'
 - ps: $index = Get-Content -Raw $indexPath
 - ps: $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', '/CSharpMinifierDemo/'
 - ps: Set-Content $indexPath $index -Encoding Ascii -NoNewline
