@@ -13,7 +13,7 @@ skip_commits:
     - '.editorconfig'
     - 'README.md'
 skip_tags: true
-install_script:
+install:
 - ps: Invoke-WebRequest -OutFile dotnet-install.ps1 https://dot.net/v1/dotnet-install.ps1
 - ps: ./dotnet-install.ps1 -Version ((type .\global.json | ConvertFrom-Json).sdk.version)
 before_build:
