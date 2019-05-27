@@ -2,7 +2,7 @@ version: '{build}'
 image: Visual Studio 2019
 environment:
   access_token:
-    secure: TODO
+    secure: I9LE/h29TZnDIt3tX2RLbHyfU0FnOhY15un0UDITT/I/2Em/41zaSgMMs+lgCXom
   github_email:
     secure: 8YvbPM+CXzOY+qR6r2+GqQ==
   DOTNET_CLI_TELEMETRY_OPTOUT: true
