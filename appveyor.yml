@@ -18,6 +18,7 @@ install:
 - ps: ./dotnet-install.ps1 -Version ((type .\global.json | ConvertFrom-Json).sdk.version)
 before_build:
 - dotnet --info
+- ps: dir env:APPVEYOR_*
 build_script:
 - dotnet publish -c Release -o dist
 - ps: $indexPath = '.\dist\CSharpMinifierDemo\dist\index.html'
