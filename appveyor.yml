@@ -28,16 +28,20 @@ build_script:
 artifacts:
 - path: dist/CSharpMinifierDemo/dist
 deploy_script:
-- ps: if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) { return }
-- git config --global credential.helper store
-- ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
-- git config --global user.email %github_email%
-- git config --global user.name "Atif Aziz"
-- git worktree add -b gh-pages ../io origin/gh-pages
-- robocopy /s dist/CSharpMinifierDemo/dist ../io
-- cd ../io
-- git add .
-- ps: git commit -m "Deployment of $($env:APPVEYOR_REPO_NAME)@$($env:APPVEYOR_REPO_COMMIT)"
+- ps: |
+    if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) {
+      Write-Warning 'Skipping deployment for non-master or PR branch.'
+      return
+    }
+    git config --global credential.helper store
+    Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+    git config --global user.email $env:github_email
+    git config --global user.name "Atif Aziz"
+    git worktree add -b gh-pages ../io origin/gh-pages
+    robocopy /s dist/CSharpMinifierDemo/dist ../io & exit 0
+    cd ../io
+    git add .
+    git commit -m "Deployment of $($env:APPVEYOR_REPO_NAME)@$($env:APPVEYOR_REPO_COMMIT)"
 notifications:
 - provider: Email
   to:
