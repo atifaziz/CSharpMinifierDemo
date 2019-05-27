@@ -27,6 +27,7 @@ build_script:
 - ps: Set-Content $indexPath $index -Encoding Ascii -NoNewline
 artifacts:
 - path: dist/CSharpMinifierDemo/dist
+- name: CSharpMinifierDemo
 deploy_script:
 - ps: |
     if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) {
