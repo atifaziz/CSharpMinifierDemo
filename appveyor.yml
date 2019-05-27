@@ -45,6 +45,7 @@ deploy_script:
     cd ../io
     git add .
     git commit -m "Deployment of $($env:APPVEYOR_REPO_NAME)@$($env:APPVEYOR_REPO_COMMIT)"
+    git push
 notifications:
 - provider: Email
   to:
