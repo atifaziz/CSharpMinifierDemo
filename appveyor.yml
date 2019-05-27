@@ -22,12 +22,12 @@ before_build:
 build_script:
 - ps: |
     dotnet publish -c Release -o dist
-    ren "dist/$($env:APPVEYOR_PROJECT_NAME)" 'dist/project'
+    ren "dist/$($env:APPVEYOR_PROJECT_NAME)" project
     $indexPath = "dist/project/dist/index.html"
     $index = Get-Content -Raw $indexPath
     $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', "/$($env:APPVEYOR_PROJECT_NAME)/"
     Set-Content $indexPath $index -Encoding Ascii -NoNewline
-artifacts:
+ggit :
 - path: dist/project/dist
   name: dist
 deploy_script:
