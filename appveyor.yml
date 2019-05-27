@@ -29,7 +29,7 @@ build_script:
     Set-Content $indexPath $index -Encoding Ascii -NoNewline
 artifacts:
 - path: dist/project/dist
-- name: dist
+  name: dist
 deploy_script:
 - ps: |
     if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) {
