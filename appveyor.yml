@@ -44,7 +44,7 @@ deploy_script:
     cd ../io
     git add . 2>&1
     git commit -m "Deployment of $($env:APPVEYOR_REPO_COMMIT)"
-    git push -n 2>&1
+    git push 2>&1
     git show --stat
 notifications:
 - provider: Email
