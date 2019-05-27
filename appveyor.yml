@@ -27,7 +27,7 @@ build_script:
 artifacts:
 - path: dist/CSharpMinifierDemo/dist
 deploy_script:
-- if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) { return }
+- ps: if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) { return }
 - git config --global credential.helper store
 - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
 - git config --global user.email %github_email%
