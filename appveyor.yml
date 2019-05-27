@@ -20,12 +20,13 @@ before_build:
 - dotnet --info
 - ps: dir env:APPVEYOR_*
 build_script:
-- dotnet publish -c Release -o dist
-- ps: ren "dist/$($env:APPVEYOR_PROJECT_NAME)" 'dist/project'
-- ps: $indexPath = "dist/project/dist/index.html"
-- ps: $index = Get-Content -Raw $indexPath
-- ps: $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', "/$($env:APPVEYOR_PROJECT_NAME)/"
-- ps: Set-Content $indexPath $index -Encoding Ascii -NoNewline
+- ps: |
+    dotnet publish -c Release -o dist
+    ren "dist/$($env:APPVEYOR_PROJECT_NAME)" 'dist/project'
+    $indexPath = "dist/project/dist/index.html"
+    $index = Get-Content -Raw $indexPath
+    $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', "/$($env:APPVEYOR_PROJECT_NAME)/"
+    Set-Content $indexPath $index -Encoding Ascii -NoNewline
 artifacts:
 - path: dist/project/dist
 - name: dist
