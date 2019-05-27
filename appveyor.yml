@@ -1,0 +1,46 @@
+version: '{build}'
+image: Visual Studio 2019
+environment:
+  access_token:
+    secure: TODO
+  github_email:
+    secure: 8YvbPM+CXzOY+qR6r2+GqQ==
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+skip_commits:
+  files:
+    - '.git*'
+    - '.editorconfig'
+    - 'README.md'
+skip_tags: true
+install_script:
+- ps: Invoke-WebRequest -OutFile dotnet-install.ps1 https://dot.net/v1/dotnet-install.ps1
+- ps: ./dotnet-install.ps1 -Version ((type .\global.json | ConvertFrom-Json).sdk.version)
+before_build:
+- dotnet --info
+build_script:
+- dotnet publish -c Release -o dist
+- ps: $indexPath = ''.\dist\CSharpMinifierDemo\dist\index.html'
+- ps: $index = Get-Content -Raw $indexPath
+- ps: $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', '/CSharpMinifierDemo/'
+- ps: Set-Content $indexPath $index -Encoding Ascii -NoNewline
+artifacts:
+- path: dist/CSharpMinifierDemo/dist
+deploy_script:
+- if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) { return }
+- git config --global credential.helper store
+- ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+- git config --global user.email %github_email%
+- git config --global user.name "Atif Aziz"
+- git worktree add -b gh-pages ../io origin/gh-pages
+- robocopy /s dist/CSharpMinifierDemo/dist ../io
+- cd ../io
+- git add .
+- ps: git commit -m "Deployment of $($env:APPVEYOR_REPO_NAME)@$($env:APPVEYOR_REPO_COMMIT)"
+notifications:
+- provider: Email
+  to:
+  - raboof-ci@googlegroups.com
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false
