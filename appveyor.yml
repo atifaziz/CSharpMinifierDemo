@@ -21,9 +21,9 @@ before_build:
 - ps: dir env:APPVEYOR_*
 build_script:
 - dotnet publish -c Release -o dist
-- ps: $indexPath = '.\dist\CSharpMinifierDemo\dist\index.html'
+- ps: $indexPath = ".\dist\$($env:APPVEYOR_PROJECT_NAME)\dist\index.html"
 - ps: $index = Get-Content -Raw $indexPath
-- ps: $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', '/CSharpMinifierDemo/'
+- ps: $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', "/$($env:APPVEYOR_PROJECT_NAME)/"
 - ps: Set-Content $indexPath $index -Encoding Ascii -NoNewline
 artifacts:
 - path: dist/CSharpMinifierDemo/dist
@@ -39,7 +39,7 @@ deploy_script:
     git config --global user.email $env:github_email
     git config --global user.name "Atif Aziz"
     git worktree add -b gh-pages ../io origin/gh-pages
-    robocopy /s dist/CSharpMinifierDemo/dist ../io & exit 0
+    robocopy /s dist/$($env:APPVEYOR_PROJECT_NAME)/dist ../io & exit 0
     cd ../io
     git add .
     git commit -m "Deployment of $($env:APPVEYOR_REPO_NAME)@$($env:APPVEYOR_REPO_COMMIT)"
