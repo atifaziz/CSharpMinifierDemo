@@ -24,7 +24,7 @@
 <textarea bind-value-oninput=@_input
           onkeyup=@(_ => Minify())
           ref="_inputTextArea"
-          autofocus
+          autofocus wrap="off"
           placeholder="Enter/Paste some C# valid code here to minify"></textarea>
 
 <textarea readonly
