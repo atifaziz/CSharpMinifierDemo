@@ -1,6 +1,8 @@
 ﻿namespace CSharpMinifierDemo
 {
+    using System.Linq;
     using Microsoft.AspNetCore.Blazor.Hosting;
+    using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Components.Builder;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -17,7 +19,10 @@
 
     public sealed class Startup
     {
-        public void ConfigureServices(IServiceCollection services) {}
+        public void ConfigureServices(IServiceCollection services) =>
+            services.AddResponseCompression(options =>
+                options.MimeTypes.Append("application/octet-stream")
+                                 .Append("application/wasm"));
 
         public void Configure(IComponentsApplicationBuilder app) =>
             app.AddComponent<App>("app");
