@@ -4,6 +4,7 @@
 @using System.Security.Cryptography
 @using System.Text;
 @using CSharpMinifier
+@inject IJSRuntime JSRuntime
 
 <div id="stats">
     @if (_ms is TimeSpan ms)
@@ -22,6 +23,7 @@
 
 <textarea bind-value-oninput=@_input
           onkeyup=@(_ => Minify())
+          ref="_inputTextArea"
           autofocus
           placeholder="Enter/Paste some C# valid code here to minify"></textarea>
 
@@ -38,6 +40,21 @@
     string _hash;
     bool _error;
     TimeSpan? _ms;
+    ElementRef _inputTextArea;
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        await base.OnAfterRenderAsync();
+        await JSRuntime.InvokeAsync<object>("$onpaste", _inputTextArea, new DotNetObjectRef(this));
+    }
+
+    [JSInvokable]
+    public void OnPaste(string value)
+    {
+        _input = value;
+        Minify();
+        StateHasChanged();
+    }
 
     void Minify()
     {
