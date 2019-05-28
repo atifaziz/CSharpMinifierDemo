@@ -46,7 +46,12 @@ deploy_script:
     git worktree add -b gh-pages ../io origin/gh-pages
     robocopy /s /purge dist/project/dist ../io /xd .* /xf .* /xf 4??.html
     cd ../io
-    git add . 2>$null
+    $ErrorActionPreference = 'Continue' # ignore warnings about EOLs
+    git add .
+    $ErrorActionPreference = 'Stop'
+    if ($LASTEXITCODE) {
+      throw "Failed to add files to Git repo (exit code = $LASTEXITCODE)."
+    }
     git checkout --orphan io
     git commit -m "Deployment of $($env:APPVEYOR_REPO_COMMIT)"
     git update-ref refs/heads/gh-pages (git rev-parse io)
