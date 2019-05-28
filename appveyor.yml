@@ -46,10 +46,11 @@ deploy_script:
     git worktree add -b gh-pages ../io origin/gh-pages
     robocopy /s /purge dist/project/dist ../io /xd .* /xf .* /xf 4??.html
     cd ../io
+    git add . 2>$null
     git checkout --orphan io
     git commit -m "Deployment of $($env:APPVEYOR_REPO_COMMIT)"
     git update-ref refs/heads/gh-pages (git rev-parse io)
-    git checkout gh-pages
+    git checkout -q gh-pages
     git push -qf
     git show --stat
 notifications:
