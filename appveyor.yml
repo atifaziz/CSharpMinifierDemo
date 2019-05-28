@@ -14,12 +14,15 @@ skip_commits:
     - 'README.md'
 skip_tags: true
 install:
-- ps: Invoke-WebRequest -OutFile dotnet-install.ps1 https://dot.net/v1/dotnet-install.ps1
-- ps: ./dotnet-install.ps1 -Version ((type .\global.json | ConvertFrom-Json).sdk.version)
+- ps: |
+    $ErrorActionPreference = 'Stop'
+    Invoke-WebRequest -OutFile dotnet-install.ps1 https://dot.net/v1/dotnet-install.ps1
+    ./dotnet-install.ps1 -Version ((type .\global.json | ConvertFrom-Json).sdk.version)
 before_build:
 - dotnet --info
 build_script:
 - ps: |
+    $ErrorActionPreference = 'Stop'
     dotnet publish -c Release -o dist
     ren "dist/$($env:APPVEYOR_PROJECT_NAME)" project
     $indexPath = "dist/project/dist/index.html"
@@ -31,6 +34,7 @@ artifacts:
   name: dist
 deploy_script:
 - ps: |
+    $ErrorActionPreference = 'Stop'
     if ($env:APPVEYOR_REPO_BRANCH -ne 'master' -or $env:APPVEYOR_PULL_REQUEST_NUMBER) {
       Write-Warning 'Skipping deployment for non-master or PR branch.'
       return
