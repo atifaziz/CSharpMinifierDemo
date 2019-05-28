@@ -52,7 +52,7 @@ deploy_script:
     if ($LASTEXITCODE) {
       throw "Failed to add files to Git repo (exit code = $LASTEXITCODE)."
     }
-    git checkout --orphan io
+    git checkout -q --orphan io
     git commit -m "Deployment of $($env:APPVEYOR_REPO_COMMIT)"
     git update-ref refs/heads/gh-pages (git rev-parse io)
     git checkout -q gh-pages
