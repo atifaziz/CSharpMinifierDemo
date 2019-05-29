@@ -13,7 +13,6 @@ app {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    align-items: center;
     background-color: #2c3e50;
 }
 
