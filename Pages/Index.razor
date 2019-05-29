@@ -13,7 +13,7 @@
         <span>Input: @_input.Length.ToString("N0") chars</span>
         <span>Output: @_output.Length.ToString("N0") chars (@(Math.Round(_output.Length * 100.0 / _input.Length, 0))%)</span>
         <span>Tokens: @_tokenCount.ToString("N0")</span>
-        <span>SHA256: <span id="hash">@_hash</span></span>
+        <span>SHA1: <span id="hash">@_hash</span></span>
     }
     else
     {
@@ -87,7 +87,7 @@
 
         _tokenCount = Scanner.Scan(_input).Count();
 
-        using (var ha = HashAlgorithm.Create("SHA256"))
+        using (var ha = HashAlgorithm.Create("SHA1"))
         {
             var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
             _hash =
