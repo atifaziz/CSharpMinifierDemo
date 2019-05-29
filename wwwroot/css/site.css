@@ -166,6 +166,15 @@ app {
     color: white;
 }
 
+#stats a {
+    color: white;
+    text-decoration: none;
+}
+
+#stats a:hover {
+    text-decoration: underline;
+}
+
 #stats > span {
     display: inline-block;
     margin-right: 1rem;
@@ -197,4 +206,8 @@ app {
 
 h1 {
     font-size: 2rem;
+}
+
+.hidden {
+    visibility: hidden;
 }

@@ -17,7 +17,9 @@
     }
     else
     {
-        <span style="visibility: hidden">&hellips;</span>
+        <a class="@(_dirty ? "hidden" : null)"
+           target="about-csmin"
+           href="https://github.com/atifaziz/CSharpMinifier">&#x1F6C8; What is this?</a>
     }
 </div>
 
@@ -33,6 +35,7 @@
 
 @functions
 {
+    bool _dirty;
     string _input;
     string _lastInput;
     string _output;
@@ -70,6 +73,8 @@
             _output = string.Empty;
             return;
         }
+
+        _dirty = true;
 
         var sw = Stopwatch.StartNew();
 
