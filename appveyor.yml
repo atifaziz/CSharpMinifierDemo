@@ -24,13 +24,12 @@ build_script:
 - ps: |
     $ErrorActionPreference = 'Stop'
     dotnet publish -c Release -o dist
-    ren "dist/$($env:APPVEYOR_PROJECT_NAME)" project
-    $indexPath = "dist/project/dist/index.html"
+    $indexPath = "dist/wwwroot/index.html"
     $index = Get-Content -Raw $indexPath
     $index = $index -replace '(?<=<base\s+href\s*=\s*")/(?=")', "/$($env:APPVEYOR_PROJECT_NAME)/"
     Set-Content $indexPath $index -Encoding Ascii -NoNewline
 artifacts:
-- path: dist/project/dist
+- path: dist/wwwroot
   name: dist
 deploy_script:
 - ps: |
@@ -44,7 +43,7 @@ deploy_script:
     git config --global user.email $env:github_email
     git config --global user.name "Atif Aziz"
     git worktree add -b gh-pages ../io origin/gh-pages
-    robocopy /s /purge dist/project/dist ../io /xd .* /xf .* /xf 4??.html
+    robocopy /s /purge dist/wwwroot ../io /xd .* /xf .* /xf 4??.html
     cd ../io
     $ErrorActionPreference = 'Continue' # ignore warnings about EOLs
     git add .
