@@ -23,15 +23,16 @@
     }
 </div>
 
-<textarea bind-value-oninput=@_input
-          onkeyup=@(_ => Minify())
-          ref="_inputTextArea"
+<textarea @bind=@_input
+          @bind:event="oninput"
+          @onkeyup=@(_ => Minify())
+          @ref="_inputTextArea"
           autofocus wrap="off"
           placeholder="Enter/Paste some C# valid code here to minify"></textarea>
 
 <textarea readonly
           class="@(_error ? "syntax-error" : null)"
-          bind=@_output></textarea>
+          @bind=@_output></textarea>
 
 @functions
 {
@@ -43,12 +44,13 @@
     string _hash;
     bool _error;
     TimeSpan? _ms;
-    ElementRef _inputTextArea;
+    ElementReference _inputTextArea;
 
-    protected override async Task OnAfterRenderAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync();
-        await JSRuntime.InvokeAsync<object>("$onpaste", _inputTextArea, new DotNetObjectRef(this));
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+            await JSRuntime.InvokeAsync<object>("$onpaste", _inputTextArea, DotNetObjectReference.Create(this));
     }
 
     [JSInvokable]
