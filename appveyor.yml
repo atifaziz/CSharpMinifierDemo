@@ -39,7 +39,7 @@ deploy_script:
       return
     }
     git config --global credential.helper store
-    Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com"
+    Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n" -NoNewLine
     git config --global user.email $env:github_email
     git config --global user.name "Atif Aziz"
     git worktree add -b gh-pages ../io origin/gh-pages
