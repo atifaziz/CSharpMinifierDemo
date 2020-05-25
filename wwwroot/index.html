@@ -25,10 +25,8 @@
     </app>
     <script>
 function $onpaste(e, dotnet) {
-    e.addEventListener('paste', () => {
-        console.log('onpaste');
-         return setTimeout(() => dotnet.invokeMethodAsync('OnPaste', e.value), 0);
-    });
+    e.addEventListener('paste', () =>
+        setTimeout(() => dotnet.invokeMethodAsync('OnPaste', e.value), 0));
 }
     </script>
     <script src="_framework/blazor.webassembly.js"></script>
