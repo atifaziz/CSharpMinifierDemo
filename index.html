@@ -5,9 +5,29 @@
     <meta name="viewport" content="width=device-width" />
     <title>C# Minifier Demo</title>
     <base href="/CSharpMinifierDemo/" />
+    <link href="_framework/dotnet.q70wdaqrn0.js" rel="preload" as="script" fetchpriority="high" crossorigin="anonymous" integrity="sha256-6kGCJ7VSr3DNPcGCKnMK0E/q1X05xHeHttPpJAUytV8=" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/spinkit.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
+    <script type="importmap">{
+  "imports": {
+    "./_framework/blazor.webassembly.js": "./_framework/blazor.webassembly.66stpp682q.js",
+    "./_framework/dotnet.native.js": "./_framework/dotnet.native.80w02bs2sp.js",
+    "./_framework/dotnet.js": "./_framework/dotnet.q70wdaqrn0.js",
+    "./_framework/dotnet.runtime.js": "./_framework/dotnet.runtime.2tx45g8lli.js"
+  },
+  "scopes": {},
+  "integrity": {
+    "./_framework/blazor.webassembly.66stpp682q.js": "sha256-3lCWrko3zwspV40aQhs2S/IMkRSarnHRKIdkHhuXIBA=",
+    "./_framework/blazor.webassembly.js": "sha256-3lCWrko3zwspV40aQhs2S/IMkRSarnHRKIdkHhuXIBA=",
+    "./_framework/dotnet.js": "sha256-6kGCJ7VSr3DNPcGCKnMK0E/q1X05xHeHttPpJAUytV8=",
+    "./_framework/dotnet.native.80w02bs2sp.js": "sha256-CDBbc3x8GMEfQJMStHa82CJrLkRzXxnGs0vzEHm+BA0=",
+    "./_framework/dotnet.native.js": "sha256-CDBbc3x8GMEfQJMStHa82CJrLkRzXxnGs0vzEHm+BA0=",
+    "./_framework/dotnet.q70wdaqrn0.js": "sha256-6kGCJ7VSr3DNPcGCKnMK0E/q1X05xHeHttPpJAUytV8=",
+    "./_framework/dotnet.runtime.2tx45g8lli.js": "sha256-2lZh9yO0fnzm3Xt7yV+Kox3DH3nK7L8hDhm84VT1xco=",
+    "./_framework/dotnet.runtime.js": "sha256-2lZh9yO0fnzm3Xt7yV+Kox3DH3nK7L8hDhm84VT1xco="
+  }
+}</script>
 </head>
 <body>
     <app>
@@ -29,6 +49,28 @@ function $onpaste(e, dotnet) {
         setTimeout(() => dotnet.invokeMethodAsync('OnPaste', e.value), 0));
 }
     </script>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="decode.js"></script>
+    <script src="_framework/blazor.webassembly.66stpp682q.js" autostart="false"></script>
+    <script>
+        Blazor.start({
+            loadBootResource: function (type, name, defaultUri, integrity) {
+                // For framework resources, use the precompressed .br files for faster downloads
+                // This is needed only because GitHub pages doesn't natively support Brotli (or even gzip for .dll files)
+                if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
+                    return (async function () {
+                        const response = await fetch(defaultUri + '.br', { cache: 'no-cache' });
+                        if (!response.ok) {
+                            throw new Error(response.statusText);
+                        }
+                        const originalResponseBuffer = await response.arrayBuffer();
+                        const originalResponseArray = new Int8Array(originalResponseBuffer);
+                        const decompressedResponseArray = BrotliDecode(originalResponseArray);
+                        const contentType = type === 'dotnetwasm' ? 'application/wasm' : 'application/octet-stream';
+                        return new Response(decompressedResponseArray, { headers: { 'content-type': contentType } });
+                    })();
+                }
+            }
+        });
+    </script>
 </body>
 </html>
