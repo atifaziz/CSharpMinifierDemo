@@ -1,8 +1,10 @@
 ﻿@page "/"
+@implements IDisposable
 @using System.Diagnostics
 @using System.Linq;
 @using System.Security.Cryptography
 @using System.Text;
+@using System.Threading;
 @using CSharpMinifier
 @inject IJSRuntime JSRuntime
 
@@ -25,7 +27,7 @@
 
 <textarea @bind=@_input
           @bind:event="oninput"
-          @onkeyup=@(_ => Minify())
+          @onkeyup=@(_ => DebouncedMinifyAsync())
           @ref="_inputTextArea"
           autofocus wrap="off"
           placeholder="Enter/Paste some C# valid code here to minify"></textarea>
@@ -36,6 +38,10 @@
 
 @functions
 {
+    static readonly TimeSpan BaseDebounce = TimeSpan.FromMilliseconds(150);
+    static readonly TimeSpan MaxDebounce = TimeSpan.FromSeconds(2);
+    const double DebounceMultiplier = 1.5;
+
     bool _dirty;
     string _input;
     string _lastInput;
@@ -45,6 +51,8 @@
     bool _error;
     TimeSpan? _ms;
     ElementReference _inputTextArea;
+    CancellationTokenSource _debounceCancellationTokenSource;
+    TimeSpan _debounceDelay = BaseDebounce;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -56,9 +64,43 @@
     [JSInvokable]
     public void OnPaste(string value)
     {
+        _debounceCancellationTokenSource?.Cancel();
         _input = value;
         Minify();
         StateHasChanged();
+    }
+
+    async Task DebouncedMinifyAsync()
+    {
+        _debounceCancellationTokenSource?.Cancel();
+        _debounceCancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = _debounceCancellationTokenSource.Token;
+
+        try
+        {
+            await Task.Delay(_debounceDelay, cancellationToken);
+
+            Minify();
+
+            // Update debounce delay based on last minification time
+
+            if (_ms is { } ms)
+            {
+                // Adaptive delay: base + multiplier of last minification time, clamped to bounds
+                var adaptiveDelay = BaseDebounce + ms * DebounceMultiplier;
+                _debounceDelay = adaptiveDelay < BaseDebounce ? BaseDebounce
+                               : adaptiveDelay > MaxDebounce ? MaxDebounce
+                               : adaptiveDelay;
+            }
+            else
+            {
+                _debounceDelay = BaseDebounce;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Debounce cancelled by new input - expected behavior
+        }
     }
 
     void Minify()
@@ -99,5 +141,14 @@
         _hash = BitConverter.ToString(ha.ComputeHash(utf8.GetBytes(_output)))
                             .Replace("-", string.Empty)
                             .ToLowerInvariant();
+    }
+
+    public void Dispose()
+    {
+        if (_debounceCancellationTokenSource is { } cancellationTokenSource)
+        {
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource.Dispose();
+        }
     }
 }
