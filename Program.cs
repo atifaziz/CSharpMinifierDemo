@@ -13,7 +13,7 @@
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
             var baseUrl = new Uri(builder.HostEnvironment.BaseAddress);
-            builder.Services.AddTransient(sp => new HttpClient { BaseAddress = baseUrl });
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = baseUrl });
             await builder.Build().RunAsync();
         }
     }

@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width" />
     <title>C# Minifier Demo</title>
     <base href="/" />
+    <link rel="preload" id="webassembly" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/spinkit.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
+    <script type="importmap"></script>
 </head>
 <body>
     <app>
@@ -29,6 +31,6 @@ function $onpaste(e, dotnet) {
         setTimeout(() => dotnet.invokeMethodAsync('OnPaste', e.value), 0));
 }
     </script>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
 </body>
 </html>

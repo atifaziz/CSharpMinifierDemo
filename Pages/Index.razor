@@ -94,13 +94,10 @@
 
         _tokenCount = Scanner.Scan(_input).Count();
 
-        using (var ha = HashAlgorithm.Create("SHA1"))
-        {
-            var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
-            _hash =
-                BitConverter.ToString(ha.ComputeHash(utf8.GetBytes(_output)))
+        var ha = SHA1.Create();
+        var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+        _hash = BitConverter.ToString(ha.ComputeHash(utf8.GetBytes(_output)))
                             .Replace("-", string.Empty)
                             .ToLowerInvariant();
-        }
     }
 }
