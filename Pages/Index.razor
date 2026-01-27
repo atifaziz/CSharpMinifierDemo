@@ -144,7 +144,14 @@
             return;
         }
 
-        _tokenCount = Scanner.Scan(_input).Count();
+        var tokenCount = _tokenCount = 0;
+        foreach (var _ in Scanner.Scan(_input))
+        {
+            if (tokenCount % 100 == 0) // check for cancellation every so tokens
+                cancellationToken.ThrowIfCancellationRequested();
+            tokenCount++;
+        }
+        _tokenCount = tokenCount;
 
         var ha = SHA1.Create();
         var utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
