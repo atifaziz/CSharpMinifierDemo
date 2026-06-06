@@ -14,10 +14,6 @@ on:
       - 'README.md'
   workflow_dispatch:
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 permissions:
   contents: read
 
@@ -46,6 +42,9 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     permissions:
       pages: write
       id-token: write
