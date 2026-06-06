@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy
 
 on:
   push:
@@ -7,22 +7,20 @@ on:
       - '.git*'
       - '.editorconfig'
       - 'README.md'
+  pull_request:
+    paths-ignore:
+      - '.git*'
+      - '.editorconfig'
+      - 'README.md'
   workflow_dispatch:
-
-permissions:
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -36,11 +34,23 @@ jobs:
         run: |
           sed -i 's|<base href="/" />|<base href="/${{ github.event.repository.name }}/" />|' dist/wwwroot/index.html
 
-      - uses: actions/configure-pages@v5
-
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/wwwroot
 
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+
       - id: deploy
         uses: actions/deploy-pages@v4
+
