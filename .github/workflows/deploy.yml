@@ -1,0 +1,58 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '.git*'
+      - '.editorconfig'
+      - 'README.md'
+  pull_request:
+    paths-ignore:
+      - '.git*'
+      - '.editorconfig'
+      - 'README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - run: dotnet publish -c Release -o dist
+
+      - name: Rewrite base href for GitHub Pages
+        run: |
+          sed -i 's|<base href="/" />|<base href="/${{ github.event.repository.name }}/" />|' dist/wwwroot/index.html
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist/wwwroot
+          include-hidden-files: true
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v6
+
+      - id: deploy
+        uses: actions/deploy-pages@v5
