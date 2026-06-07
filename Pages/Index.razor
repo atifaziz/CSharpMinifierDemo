@@ -8,7 +8,7 @@
 @inject IJSRuntime JSRuntime
 
 <div id="stats">
-    @if (_ms is TimeSpan ms)
+    @if (_ms is { } ms)
     {
         <span title="Performance">&#x231A; @ms.TotalSeconds.ToString("0.0000") secs</span>
         <span>Input: @_input.Length.ToString("N0") chars</span>
